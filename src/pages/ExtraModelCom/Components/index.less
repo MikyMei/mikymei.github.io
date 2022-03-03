@@ -6,48 +6,19 @@
 
 */
 
-
 .sliderBar {
-  left: 25%;
-  top: 10%;
-  height: 40%;
+  left: 10%;
+  top: 20%;
+  height: 20%;
   position: absolute;
-
 
   :global {
     .ant-slider-track {
       position: absolute;
-      width: 1.5rem;
-      opacity:0.4;
-
       height: 4px;
-      background-color: #00FFE8;
+      background-color: #b1acac;
       border-radius: 2px;
       transition: background-color 0.3s;
-    }
-
-    .ant-slider-rail {
-      width: 1.5rem !important;
-      height: 100%;
-      opacity:0.2;
-    }
-
-    .ant-slider-handle {
-      width: 1.5rem;
-      margin-left:0;
-      background-color: #00FFE8;
-      border: solid 0.125rem rgb(145 213 255 / 50%);
-      border-radius: 1%;
-      box-shadow: 0;
-      cursor: pointer;
-      transition: border-color 0.3s, box-shadow 0.6s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    }
-
-    .ant-slider-vertical .ant-slider-mark {
-      top: 0;
-      left: 0rem;
-      width: 1.5rem;
-      height: 100%;
     }
 
   }
@@ -106,16 +77,15 @@
 }
 
 .infoCard {
-  width: 20rem;
+  width: 25rem;
   min-height: 30%;
   height: auto;
   margin-top: -10rem;
-  margin-left: 1rem;
-  background-color: rgba(48, 210, 189, 0.2);
+  background-color: rgba(51, 150, 231, 0.2);
   //display: none;
 
   position: absolute;
-  border: #30D2BD solid;
+  border: #1b91ff solid;
   border-radius: 10px;
   //
   //// 隐藏和显示地切换动画
@@ -137,39 +107,6 @@
       list-style: none;
       font-feature-settings: 'tnum', "tnum";
       border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
-    }
-
-    .ant-carousel .slick-dots-bottom {
-      bottom: -8px;
-    }
-    .ant-tabs {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 12px;
-      font-size: 14px;
-      font-variant: tabular-nums;
-      line-height: 1.5715;
-      list-style: none;
-      font-feature-settings: 'tnum', "tnum";
-      display: flex;
-      overflow: hidden;
-    }
-    .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-      color: #FF9C00;
-      text-shadow: 0 0 0.25px currentColor;
-    }
-
-    .ant-tabs-tab-btn {
-      outline: none;
-      transition: all 0.3s;
-      color: white;
-      //opacity: 0.4;
-    }
-
-    .ant-tabs-ink-bar {
-      position: absolute;
-      background: #FF9C00;
-      pointer-events: none;
     }
   }
 }
@@ -305,68 +242,12 @@
 }
 
 .organDesc{
-  color: #ffffff;
+  color:#a4a4a4;
   margin: 12px;
 }
 
 .illDesc{
   color: #a4a4a4;
-  margin: 8px 2px;
-  display: flex;
-  width: 18rem;
-  min-height: 4rem;
-  overflow-y: scroll;
+  margin: 12px 2px;
 
-}
-
-.output{
-  width: 100%;
-  height: 100%;
-  background: url('https://3-d-health-1253940515.cos.ap-shanghai.myqcloud.com/sceneBackground.png') center no-repeat;
-  background-size:110%;
-
-
-}
-
-.webglOutput{
-  width:100%;
-  height:100%;
-}
-
-
-.closeIcon{
-  color:white;
-  opacity: 0.6;
-}
-
-
-.illType{
-  color:#00FFDE;
-
-}
-
-
-.compareButton{
-  left: 56%;
-  top: 5%;
-  height: 1.5rem;
-  width: 6rem;
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-}
-
-.compareText{
-  font-size: 16px;
-  font-family: "PingFang_SC";
-  font-weight: 500;
-  color: #30D2BD;
-  line-height: 22px;
-}
-
-.compareText:hover{
-  text-shadow : 0 0 10px currentColor;
 }

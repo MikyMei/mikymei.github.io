@@ -5,8 +5,6 @@ import { join } from 'path';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
-import px2rem from 'postcss-plugin-px2rem';
-
 
 const { REACT_APP_ENV } = process.env;
 
@@ -47,19 +45,7 @@ export default defineConfig({
   esbuild: {},
   title: false,
   ignoreMomentLocale: true,
-  proxy: {
-    '/api2': {
-      target:'http://111.229.63.2:9008/api/',  // 履约后台服务
-      // target: 'http://122.51.155.188:8006', // 后台服务地址以及端口号 (郭哥的)
-      // target: 'http://81.68.184.44:8000', // 后台服务地址以及端口号 (郭哥的)
-      // target: 'http://101.34.135.102:8011', // 后台服务地址以及端口号 (zzz)/
-      // target: 'http://101.34.135.102:8010', // 后台服务地址以及端口号 (家辉)/
-
-      ws: true, // websoket 服务
-      changeOrigin: true, //是否跨域
-      pathRewrite: { '/api2': '' }
-    },
-    proxy:[REACT_APP_ENV || 'dev']},
+  proxy: proxy[REACT_APP_ENV || 'dev'],
   manifest: {
     basePath: '/',
   },
@@ -82,12 +68,6 @@ export default defineConfig({
   nodeModulesTransform: { type: 'none' },
   // webpack5: {},
   exportStatic: {},
-  // fastRefresh: {},
+  fastRefresh: {},
   runtimePublicPath:true,
-  extraPostCSSPlugins: [
-    px2rem({
-      rootValue: 16, // 开启hd后需要换算：rootValue=designWidth*100/750,此处设计稿为1920，所以1920*100/750=256
-      selectorBlackList: ['ant-pro-basicLayout'], //以包含t_npx的class不需要转换
-    }),
-  ],
 });

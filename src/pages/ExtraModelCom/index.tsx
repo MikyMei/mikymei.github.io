@@ -10,939 +10,185 @@
 import React, {useEffect, useState, useRef} from 'react';
 import styles from './index.less'
 import BodyModel from "@/pages/ExtraModelCom/Components/BodyMOdel";
-import {
-  Avatar,
-  Badge,
-  Carousel,
-  Col,
-  Divider,
-  Row,
-  Tag,
-  Tooltip,
-  Spin,
-  Select,
-  Empty,
-  Rate,
-  Table,
-  Radio,
-  Button, Space
-} from "antd";
-import {AntDesignOutlined, CloseCircleOutlined, HeartFilled, HeartOutlined} from "@ant-design/icons";
+import {Avatar, Badge, Carousel, Col, Divider, Row, Tag, Tooltip} from "antd";
+import {AntDesignOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import {connect, Dispatch} from "umi";
-import {JudgeHealthRelationship, MatchOrga} from "@/utils/dataReStructure";
-import WholeBodyOrga from "@/pages/ExtraModelCom/Components/WholeBodyOrga";
-import MixLineCharts from "@/pages/ExtraModelCom/Components/MixLineCharts";
-import MixLineCharts2 from "@/pages/ExtraModelCom/Components/MixLineCharts2";
-import MixLineCharts3 from "@/pages/ExtraModelCom/Components/MixLineCharts3";
-import MyTable from "@/pages/ExtraModelCom/Components/MyTable";
 
-const {Option} = Select;
 
 const NormalProject: React.FC = (props: { bodyModelInfo: any, dispatch: Dispatch }) => {
 
-
-
-
   const {bodyModelInfo, dispatch} = props;
 
-  const {
-    personalInfo,
-    allOrgaList,
-    personalHealthScore,
-    personalScoreHistory,
-    commonScoreHistory,
-    keyHealthIndex,
-    abnormalOrgaTop4,
-    abnormalOrgaTop4Detail,
-    loadStatus,
+  const {orgaName, orgaDesc, illList, infoDisplay, infoTop, infoRight,} = bodyModelInfo;
 
-    /**
-     * 以下主要用于点击器官之后进行的
-     * */
-
-    selectedOrga,
-    currentOrgaScoreHistory,
-    currentOrgaCommonHistory,
-    currentOrgaHealthAdvice,
-    currentIindexDetail,
-    illList,
-    wholeOrgaIll
-  } = bodyModelInfo;
-
+  // console.log(orgaName, orgaDesc, illList, newInfoDisplay, newInfoTop, newInfoRight);
 
   const bodyRef = useRef(null);
   const [currentOrga, setCurrentOrga] = useState<any>('');
   const [orgaDescription, setOrgaDescription] = useState<any>('');
   const [illTypeList, setIlltypelist] = useState<any>([]);
   const [bodyModel, setBodyModel] = useState<any>();
-  const [choosenPart, setChoosenPart] = useState<any>(); // 当前选中的身体部位， 默认直接选中第一个，没有的话，就渲染一个无异常部位
-  const [partOptions, setPartOptions] = useState<any>(); // 将身体的所有异常部位渲染成一个options数组，
-  const [orgaOptions, setOrgaOptions] = useState<any>(); // 以身体的部位为key值，value为器官卡片的数组，在数据请求完成后，一次渲染
-  const [optionsCard, setOptionsCard] = useState<any>([]); // 主要用于存储已经被高亮的器官卡片样式，当进行其他操作的时候，再恢复，如：关闭器官的信息窗口，点击其他身体部位，选择其他器官卡片
 
-  const [visible, setVisible] = useState<any>(false)
-  const [modalTitle, setModalTitle] = useState<any>('');
-  const [rightColumnContent, setRightColumnContent] = useState<any>();
-  const [nowSelectedOrga, setNowSelectedOrga] = useState<any>("555");
-  const [defaultSelectedIndex, setDefaultSelectedIndex] = useState<any>(null); // 默认选中的异常标识，可以用在右侧信息栏
+  const bodyPart = {
+    Body002: "包在身体表面，直接同外界环境接触，具有保护、排泄、调节体温和感受外界刺激等作用的一种器官，是人的身体器官中最大的器官",
+    Circulatory_Heart001: "心脏主要功能是为血液流动提供动力，把血液运行至身体各个部分。人类的心脏位于胸腔中部偏左下方，体积约相当于一个拳头大小，重量约250克。女性的心脏通常要比男性的体积小且重量轻",
+    Skeletal001: "人或动物体内或体表坚硬的组织。分内骨骼和外骨骼两种，人和高等动物的骨骼在体内，由许多块骨头组成，叫内骨骼；软体动物体外的硬壳以及某些脊椎动物（如鱼、龟等）体表的鳞、甲等叫外骨骼。",
+
+  }
+
 
   const enlargeItem = async (value: any) => {
-    await bodyRef.current.resetSlider();
-    await bodyRef.current.testEnlarge(value);
+    const contentlist1: any = [];
+    contentlist1.push(
+      <div key={1}>
+        <Row className={styles.illType}>
+          <Tag color="orange">肺占位性病变{value ? value : ""}</Tag>
+        </Row>
+        <Row className={styles.illDesc}>占位性病变通常泛指肿瘤（良性的、恶性的）、寄生虫等，而不涉及疾病的病因。
+          人和高等动物的呼吸器官。人的肺在胸腔内,左右各一,和支气管相连。
+          人和高等动物的呼吸器官。人的肺在胸腔内,左右各一,和支气管相连。 人和高等动物的呼吸器官。人的肺在胸腔内,左右各一,和支气管相连。</Row>
+      </div>
+    )
+    contentlist1.push(
+      <div key={2}>
+        <Row className={styles.illType}>
+          <Tag color="orange">肺占位性病变</Tag>
+        </Row>
+        <Row className={styles.illDesc}>占位性病变通常泛指肿瘤（良性的、恶性的）、寄生虫等，而不涉及疾病的病因。
+          人和高等动物的呼吸器官。人的肺在胸腔内,左右各一,和支气管相连。
+        </Row>
+      </div>
+    )
+    // setCurrentOrga(value);
+    // if (dispatch){
+    //   dispatch(
+    //     {
+    //       type: 'bodyModel/initOrgaInfo',
+    //       payload: {
+    //         newOrgaName: value,
+    //         newOrgaDesc: bodyPart[`${value}`],
+    //         newIllList: contentlist1,
+    //       }
+    //     }
+    //   )
+    // }
+
+    bodyRef.current.testEnlarge(value);
+
+    // changeInfoWindow();
 
 
   }
 
+  // useEffect(() => {
+  //   changeInfoWindow(infoDisplay, infoTop, infoRight);
+  // }, [infoDisplay, infoTop, infoRight])
+
+
+  const changeInfoWindow = (display: any, top: any, right: any) => {
+    const testAnt = document.getElementById("testAnt");
+    testAnt.style.display = display;
+    testAnt.style.top = top;
+    testAnt.style.right = right;
+  }
 
   const closeInfoWindow = () => {
-    if (optionsCard.length > 0 && choosenPart != "全身性器官") {
-      bodyRef.current.testClose();
-    }
+    bodyRef.current.testClose();
+    changeInfoWindow("none", 100, 100);
   }
 
-  useEffect(() => {
-    /**
-     * 在这里进行加载地时候，加入一个修改全局加载地状态，loading
-     *
-     * */
 
-    if (dispatch) {
-      dispatch({
-        type: "bodyModel/changeLoadStatus",
-        payload: {
-          newLoadStatus: true
-        }
-      })
-    }
+  useEffect(() => {
 
     setBodyModel(<BodyModel onRef={bodyRef} orgaDescription={orgaDescription} currentOrga={currentOrga}
                             illtypelist={illTypeList}>
+
+
     </BodyModel>)
   }, [])
 
-
-  useEffect(() => {
-    GetAllBodyHealth();
-  }, [])
-
-  /*
-  * 当获得了top4一场器官的时候，再去分别获得详细信息
-  * */
-
-  useEffect(() => {
-
-    /**
-     * 当第一次进入页面加载的时候，获得了个人健康所需的数据，就动态生成这些内容，
-     * 主要有个人信息生成
-     * 器官卡片生成
-     * 健康信息生成
-     * 四个指标生成
-     * 异常气管生成
-     * */
-    if (JSON.stringify(allOrgaList) != "{}" && !partOptions) {
-      GenerateOrgaRelated()
-    }
-
-  }, [abnormalOrgaTop4]);
-
-  const OpenWholeOrga = (e: any, iconName: any, orgaName: any, orgaAll) => {
-    e.currentTarget.style.boxShadow = '0px 0px 10px #d2a845 inset';
-    /**
-     * 要改变的项目是当前选中的，框的阴影图， 名字字体颜色，成绩字体颜色高亮, 在关闭信息窗的时候恢复，和点击其他的时候恢复
-     * */
-    e.currentTarget.children[0].children[0].children[0].children[0].src = `./img/allOrgaIcon/yellowOne/${iconName}.png`;
-    e.currentTarget.children[0].children[1].children[0].style.color = "#d2a845";
-    // e.currentTarget.children[0].children[2].style.color = "#d2a845";
-    e.currentTarget.children[0].children[2].style.opacity = 1;
-    e.currentTarget.children[0].children[2].style.textShadow = "0 0 10px currentColor";
-
-    optionsCard.push(e.currentTarget);
-    RestoreStyle();
-
-    //  在这里请求全身性器官的具体病症
-    if (dispatch) {
-
-
-      const orgaParams = {
-        orgaName: orgaAll.name
-      }
-
-      dispatch({
-        type: "bodyModel/getSelectedOrgaDetail",
-        payload: {
-          orgaAll,
-          orgaParams,
-        }
-      });
-
-    }
-
-    GetWholeOrgaDetail(orgaName);
-  }
-
-  const GetWholeOrgaDetail = (orgaName: any) => {
-    if (dispatch) {
-      dispatch({
-        type: "bodyModel/getWholeOrgaIllDetail",
-        payload: {
-          params: {
-            orgaName
-          }
-        }
-      })
-    }
-
-    setModalTitle(`${orgaName}异常标识`);
-    setVisible(true);
-  }
-  const CloseOrgaModal = () => {
-    // if (dispatch) {
-    //   dispatch({
-    //     type: "bodyModel/initSelectedOrga",
-    //     payload: {
-    //       newSelectedOrga: null
-    //     }
-    //   })
-    // }
-    setVisible(false);
-  }
-
-
-  const ScoreColor = (score: any) => {
-
-    if (score > 80) {
-      return {color: "#FF9C00"}
-    }
-    if (score > 60) {
-      return {color: "#00FFDE"}
-    } else {
-      return {color: "#e21313"}
-    }
-
-
-  }
-
-  /**
-   * 渲染器官和申生成器官的卡片
-   * */
-  const GenerateOrgaRelated = () => {
-
-    const partList = Object.keys(allOrgaList);
-    const partOptionsTemp: any[] = [];
-    if (partList.length > 0) {
-      partList.map(item => {
-        partOptionsTemp.push(
-          <Option key={item} value={item}>{item}</Option>
-        )
-      })
-    } else {
-      partOptionsTemp.push(
-        <Option key={"暂无异常部位"} value={"暂无异常部位"}>暂无异常部位</Option>
-      )
-    }
-
-    setPartOptions(partOptionsTemp);
-    partList[0] ? setChoosenPart(partList[0]) : null;
-
-    /**
-     * 在这里生成具体的器官带点击功能的卡片
-     * */
-    const orgaCardList: any = {};
-
-    if (partList.length > 0) {
-      for (let key in allOrgaList) {
-        orgaCardList[`${key}`] = [];
-        allOrgaList[`${key}`].map((item: any) => {
-          const orgaRelated = MatchOrga(item.name)
-          orgaCardList[`${key}`].push(
-            <div key={item.name} className={styles.signleOption_unchecked}
-                 onClick={(e) => {
-                   key != "全身性器官" ? ClickSignleOrga(e, item.name, orgaRelated.meshName, orgaRelated.iconName, item) : OpenWholeOrga(e, orgaRelated.iconName, item.name, item)
-                 }}>
-              <Row gutter={24} className={styles.optionContent}>
-                <Col className={styles.optionIcon}>
-                  <Badge className={styles.badgeIcon} count={item.exceptionCount || 0} size="small" offset={[-6, 6]}
-                         color={"#ff9c01"}>
-                    <img className={styles.optionIconImg}
-                         src={`./img/allOrgaIcon/greenOne/${orgaRelated.iconName}.png`}/>
-                  </Badge>
-
-                </Col>
-                <Col className={styles.optionDesc}>
-                  <Row className={styles.optionName}>{item.name || ''}</Row>
-                  <Row className={styles.indexCount}><span
-                    className={styles.yellowText}>{item.exceptionCount || 0}</span>&nbsp;种异常标识</Row>
-                </Col>
-                <Col className={styles.optionScore}
-                     style={ScoreColor(item.score || 0)}
-                >
-                  {item.score || 0}
-                </Col>
-              </Row>
-            </div>
-          )
-
-        })
-      }
-    }
-    setOrgaOptions(orgaCardList);
-
-  }
-
-  /**
-   * 判断当前是否有已经被选中的器官卡片，如果有就恢复
-   * */
-
-  const RestoreStyle = () => {
-    if (optionsCard.length > 1) {
-      optionsCard[0].children[0].children[0].children[0].children[0].src = optionsCard[0].children[0].children[0].children[0].children[0].src.replace(/yellowOne/, "greenOne");
-
-      optionsCard[0].style.boxShadow = '0 0 0px #ffffff';
-      optionsCard[0].children[0].children[1].children[0].style.color = "#fcfcfc";
-      optionsCard[0].children[0].children[1].children[0].style.opacity = 0.8;
-      // optionsCard[0].children[0].children[2].style.color = "#00FFDE";
-      optionsCard[0].children[0].children[2].style.opacity = 0.7;
-      optionsCard[0].children[0].children[2].style.textShadow = "0 0 0px #ffffff";
-      optionsCard.splice(0, 1);
-    }
-  }
-
-
-  /**
-   * 点击器官卡片进行的操作：改变卡片的样式，打开指定模型（改变模型位置，请求器官的数据）
-   * */
-  const ClickSignleOrga = (e: any, orgaName: any, meshName: any, iconName: any, orgaAll: any) => {
-    // RestoreStyle();
-    e.currentTarget.style.boxShadow = '0px 0px 10px #d2a845 inset';
-    /**
-     * 要改变的项目是当前选中的，框的阴影图， 名字字体颜色，成绩字体颜色高亮, 在关闭信息窗的时候恢复，和点击其他的时候恢复
-     * */
-    e.currentTarget.children[0].children[0].children[0].children[0].src = `./img/allOrgaIcon/yellowOne/${iconName}.png`;
-    e.currentTarget.children[0].children[1].children[0].style.color = "#d2a845";
-    // e.currentTarget.children[0].children[2].style.color = "#d2a845";
-    e.currentTarget.children[0].children[2].style.opacity = 1;
-    e.currentTarget.children[0].children[2].style.textShadow = "0 0 10px currentColor";
-
-
-    /**
-     * 在这里判断是否已经打开，如果是，就关闭,判断是否是重复点击
-     * */
-
-
-    if (dispatch && optionsCard[0] != e.currentTarget ) {
-
-
-      const orgaParams = {
-        orgaName: orgaAll.name
-      }
-      const indexParams = {
-        indexName: orgaAll.name
-      }
-      dispatch({
-        type: "bodyModel/getSelectedOrgaDetail",
-        payload: {
-          orgaAll,
-          orgaParams,
-          indexParams
-        }
-      });
-
-    }
-
-    optionsCard.push(e.currentTarget);
-
-    RestoreStyle();
-    enlargeItem(meshName);
-
-
-  }
-
-
-  const GetAllBodyHealth = () => {
-    if (dispatch) {
-      const params = {
-        personalHealthInfoParams: {
-          user_id: "2017014713"
-        },
-        personalScoreHistoryParams: {
-          user_id: "2017014713"
-        },
-
-        keyHealthIndexParams: {
-          user_id: "2017014713"
-        },
-      }
-      dispatch({
-        type: "bodyModel/getAllPersonalHealthInformation",
-        payload: {
-          params,
-        }
-      })
-    }
-  }
-
-
-  /**
-   * 主要用于右侧动态生成内容
-   * */
-
-  useEffect(() => {
-    if (personalHealthScore && personalScoreHistory && commonScoreHistory && keyHealthIndex && abnormalOrgaTop4) {
-      GenerateRightPerson();
-      // GeneratRightOrga()
-    }
-
-  }, [personalHealthScore, personalScoreHistory, commonScoreHistory, keyHealthIndex, abnormalOrgaTop4,])
-
-  useEffect(() => {
-    if (selectedOrga && illList) {
-      GeneratRightOrga();
-    } else {
-      if (personalHealthScore && personalScoreHistory && commonScoreHistory && keyHealthIndex && abnormalOrgaTop4) {
-        GenerateRightPerson();
-        // GeneratRightOrga()
-      }
-
-    }
-  }, [selectedOrga,  illList])
-
-  const Generate4Index = (topList: any) => {
-
-    const cardlist: any = [];
-    const result: any = [];
-
-
-    topList.map(top => {
-      const orgaRelated = MatchOrga(top.name);
-      /**
-       * 在这里将每个item进行判断当前得分与给定的健康范围地关系，判读关系文本和展示图标
-       * */
-
-      const healthRelation = JudgeHealthRelationship(top);
-
-      cardlist.push(
-        <div key={top.name} className={styles.singleTop}>
-
-          <img
-            key={orgaRelated.iconName}
-            className={styles.topIcon}
-            src={`./img/indexIcon/${healthRelation.iconType}/${orgaRelated.iconName}.png`}
-          />
-          <div
-            key={orgaRelated.name}
-            className={styles.descText}
-          >
-            <div className={styles.topText}>{orgaRelated.orgaName}得分&nbsp;
-              <span className={styles.rankType}>
-                {healthRelation.desc}
-              </span>
-            </div>
-            <div className={styles.bottomText}>健康范围</div>
-          </div>
-          <div className={styles.indexScore}>
-            {top.score}
-          </div>
-        </div>
-      );
+  const renderCarsoule = () => {
+    const contentList: any = [];
+    illList.map((illList: any) => {
+      contentList.push(<div key={2}>
+        <Row className={styles.illType}>
+          <Tag color="orange">肺占位性病变</Tag>
+        </Row>
+        <Row className={styles.illDesc}>占位性病变通常泛指肿瘤（良性的、恶性的）、寄生虫等，而不涉及疾病的病因。
+          人和高等动物的呼吸器官。人的肺在胸腔内,左右各一,和支气管相连。
+        </Row>
+      </div>)
     })
-
-    result.push(
-      <div className={styles.topResult}>
-        <div className={styles.top2Card}>{cardlist.slice(0, Math.floor(cardlist.length / 2))}</div>
-        <div className={styles.bottom2Card}>{cardlist.slice(Math.floor(cardlist.length / 2), cardlist.length)}</div>
-
-      </div>
-    );
-    return result;
-
-  };
-
-  const GenerateTop4Orga = (top4list: any) => {
-    const cardlist: any = [];
-    const result: any = [];
-
-    const oldList = top4list.concat();
-
-
-    /**
-     * 进行选择排序，从第二个开始遍历，知道遇到比第一个低的，就交换位置
-     * */
-    if (oldList.length > 1) {
-      for (let i = 1; i < oldList.length; i++) {
-        if (oldList[i].score < oldList[0].score) {
-          const tempTop = oldList[i];
-          oldList[i] = oldList[0];
-          oldList[0] = tempTop
-
-        }
-      }
-    }
-
-
-    oldList.map((top: any, index: any) => {
-      const orgaRelated = MatchOrga(top.name);
-      if (index === 0) {
-        // 最低地，要黄色
-        cardlist.push(
-          <div key={top.name} className={styles.abnormalOrga}>
-            <div className={styles.leftCardColumn}>
-              <Row className={styles.topOrgaName1}>
-                <Tooltip placement="right" title={`Top1${top.name}`}>
-                  Top1{top.name}
-                </Tooltip>
-              </Row>
-              <Row className={styles.orgaIconRow}>
-                <img className={styles.abnormalOrgaIcon}
-                     src={`./img/allOrgaIcon/yellowOne/${orgaRelated.iconName}.png`}/>
-                {/*<span className={styles.abnormalScoreNumber}>{top.score}</span>*/}
-              </Row>
-
-
-            </div>
-            <div className={styles.RightCardColumn}>
-              <MixLineCharts3
-                mainlyScoreHistory={[...top.historyScore]}
-                commonScoreHistory={[...top.commonScore]}
-                lineData={{
-                  XData: ["2016", "2017", "2018", "2019", "2020"],
-                  data: [50, 20, 30, 40, 100], data2: [10, 30, 40, 90, 20]
-                }}/>
-            </div>
-
-          </div>
-        )
-      } else {
-        cardlist.push(
-          <div key={top.name} className={styles.abnormalOrga}>
-            <div className={styles.leftCardColumn}>
-              <Row className={styles.topOrgaName}>{top.name}</Row>
-              <Row className={styles.orgaIconRow}>
-                <img className={styles.abnormalOrgaIcon}
-                     src={`./img/allOrgaIcon/greenOne/${orgaRelated.iconName}.png`}/>
-                {/*<span className={styles.abnormalScoreNumber}>{top.score}</span>*/}
-              </Row>
-
-
-            </div>
-            <div className={styles.RightCardColumn}>
-              <MixLineCharts2
-                mainlyScoreHistory={[...top.historyScore]}
-                commonScoreHistory={[...top.commonScore]}
-                lineData={{
-                  XData: ["2016", "2017", "2018", "2019", "2020"],
-                  data: [50, 20, 30, 40, 100], data2: [10, 30, 40, 90, 20]
-                }}/>
-            </div>
-
-          </div>
-        )
-        ;
-      }
-
-
-    })
-
-    result.push(
-      <div className={styles.topResult}>
-        <div className={styles.top2Card}>{cardlist.slice(0, Math.floor(cardlist.length / 2))}</div>
-        <div className={styles.bottom2Card}>{cardlist.slice(Math.floor(cardlist.length / 2), cardlist.length)}</div>
-
-      </div>
-    );
-    return result;
-
+    return contentList
   }
-
-  const GenerateRightPerson = () => {
-    setRightColumnContent(
-      <div className={styles.rightColumn}>
-        <div className={styles.rightTop}>
-          <div className={styles.topTitle}>基本健康信息</div>
-          <div className={styles.topCharts}>
-            <div className={styles.healthScore}>
-              <div className={styles.scoreNumber}>{(personalHealthScore || 0).toFixed(1)}</div>
-              <div className={styles.scoreDesc}>健康得分</div>
-            </div>
-            <div className={styles.healthCharts}>
-
-              <MixLineCharts
-                mainlyScoreHistory={[personalScoreHistory]}
-                commonScoreHistory={[commonScoreHistory]}
-                lineData={{
-                  XData: ["2016", "2017", "2018", "2019", "2020"],
-                  data: [50, 20, 30, 40, 100],
-                  data2: [10, 30, 40, 90, 20]
-                }}/>
-            </div>
-          </div>
-          <div className={styles.indexFour}>
-
-            {Generate4Index(keyHealthIndex)}
-          </div>
-
-
-        </div>
-        <div className={styles.rightBottom}>
-          <div className={styles.bottomTitle}>异常器官Top4</div>
-          <div className={styles.bottomCharts}>
-            {GenerateTop4Orga(abnormalOrgaTop4Detail)}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const healthAdvice = [
-    "饮食宜软，易消化，少食刺激性及过冷、过热、过硬的食物，定时定量进餐，细嚼慢咽，戒烟酒，少用对胃有刺激的药物，必要时检查胃镜。",
-    "（奥美拉唑/埃索美拉唑20mg　Bid＋阿莫西林1000mg Bid＋克拉霉素0.5　Bid ＋枸橼酸铋钾220mg Bid，正规服用14天，停药一月后复查呼气试验），随访胃镜。",
-    "每年随访胃镜，消化科随诊。"
-  ]
-  const abnormalIndex = [
-    {projectName: "电子胃镜全套1", resultKeyWords: {content: "“贲门”增生性息肉", direction: null}, normalRank: "--", careDegree: 4},
-    {
-      projectName: "胃蛋白酶原Ⅰ",
-      resultKeyWords: {content: 249, direction: "up"},
-      normalRank: "70～200ng/ml",
-      careDegree: 4.5
-    },
-    {
-      projectName: "胃蛋白酶原Ⅱ",
-      resultKeyWords: {content: 33.1, direction: "down"},
-      normalRank: "1～28.2ng/ml",
-      careDegree: 2
-    },
-    {
-      projectName: "胃蛋白酶原Ⅱ",
-      resultKeyWords: {content: 33.1, direction: "down"},
-      normalRank: "1～28.2ng/ml",
-      careDegree: 2
-    },
-  ]
-  const columns = [
-    {
-      title: "项目名",
-      dataIndex: "projectName",
-      key: "projectName",
-    },
-    {
-      title: "结果或关键词",
-      dataIndex: "resultKeyWords",
-      key: "resultKeyWords",
-      render: (text: any, record: any, index: any) => {
-        // (record.resultKeyWords.direction&&record.resultKeyWords.direction==="up")?return
-
-        if (record.resultKeyWords.direction) {
-          return <span>
-           {record.resultKeyWords.content}&nbsp;&nbsp;
-            {record.resultKeyWords.direction === "up" ? <img src={"./img/upArrow.png"}/> :
-              <img src={"./img/downArrow.png"}/>}
-         </span>
-        } else {
-          return <span>{record.resultKeyWords.content}</span>
-        }
-      }
-    },
-    {
-      title: "正常值范围",
-      dataIndex: "normalRank",
-      key: "normalRank",
-    },
-    {
-      title: "关心程度",
-      dataIndex: "careDegree",
-      key: "careDegree",
-      width: 200,
-      render: (text: any, record: any) => {
-
-        return <Rate allowHalf disabled className={record.careDegree > 3 ? styles.heartIcon : styles.heartIcon2}
-                     defaultValue={record.careDegree} character={() => <HeartFilled/>}/>
-
-      }
-    }
-  ]
-
-  /**
-   * 将建议遍历生成一些减小一列表
-   * */
-  const GenerateAdviceList = (list: any) => {
-    const advice: any = [];
-    if (list.length > 0) {
-      list.map((item: any, index: any) => {
-        advice.push(
-          <Row key={index} className={styles.signleAdvice}>
-            <Col className={styles.adviceHead}>
-              <div className={styles.headIcon}/>
-            </Col>
-            <Col className={styles.adviceText}>{item}</Col>
-
-          </Row>
-        );
-      })
-    } else {
-      advice.push(
-        <Empty className={styles.emptyContent} description={"暂无建议"}/>
-      )
-    }
-
-
-    return advice;
-  }
-
-  /**
-   * 切换异常标识
-   * */
-  const changeIndex = (e: any) => {
-    /**
-     * 在这里会进行的操作是，获得异常标识地表哥内容，和后期地打开相应动画，
-     * */
-
-
-    if (dispatch) {
-      dispatch({
-        type: "bodyModel/getSelectedIndexProject",
-        payload: {
-          indexParams: {
-            indexName: e.target.value
-          }
-
-        }
-      })
-    }
-
-    StartAnimation(e.target.value);
-
-  }
-
-
-  const StartAnimation = (keyName: any) => {
-
-
-    /**
-     * 需要判断当前选中的部位是否是全身性器官，因为全身性器官没有具体的模型动画
-     * */
-
-    if(choosenPart!=="全身性器官"){
-      bodyRef.current.setInfoTabs();
-      bodyRef.current.testPlay(keyName);
-    }
-
-
-
-
-  }
-
-
-  const GenerateRadioButton = (illIndexList: any) => {
-    const buttonList: any = [];
-    let IllListTemp: any = [];
-    const result: any = [];
-    if (Array.isArray(illIndexList)) {
-      IllListTemp = illIndexList;
-    } else {
-      IllListTemp = illIndexList.illType || []
-    }
-    if (IllListTemp.length > 0) {
-      IllListTemp.map((item: any, index: any) => {
-        buttonList.push(
-          <Radio.Button
-            onClick={()=>{ choosenPart!=="全身性器官"?bodyRef.current.sliderDivIndex(index):"" }}
-            key={item.illName || item.name}
-            className={styles.radioButton}
-            value={item.illName || item.name}>{item.illName || item.name}</Radio.Button>
-        )
-      })
-
-
-      if (dispatch) {
-        dispatch({
-          type: "bodyModel/getSelectedIndexProject",
-          payload: {
-            indexParams: {
-              indexName: IllListTemp[0].illName || IllListTemp[0].name
-            }
-          }
-        })
-        if(IllListTemp[0].illName ){
-          bodyRef.current.setIndex(IllListTemp[0].illName );
-        }
-
-
-      }
-
-      result.push(
-        <Radio.Group
-          defaultValue={IllListTemp[0].illName || IllListTemp[0].name}
-          className={styles.radioGroup}
-          onChange={changeIndex}
-          optionType="button"
-        >
-          <Space size={"middle"}>
-            {buttonList}
-
-          </Space>
-
-        </Radio.Group>
-      )
-    }
-
-
-    return result;
-
-
-  }
-
-  const GeneratRightOrga = () => {
-    const illListTemp = choosenPart === "全身性器官" ? wholeOrgaIll : illList;
-    // console.log("当前一场表示", Array.isArray(illListTemp));
-    // const
-    // if (Array.isArray(illListTemp)){
-    //
-    // }
-    /**
-     * 如果是数组，那就是全身性器官，数组中的元素是疾病
-     * 如果是对象，那内容就是illtype
-     * */
-
-    setRightColumnContent(
-      <div className={styles.rightColumn}>
-        <div className={styles.rightOrgaTop}>
-          <div className={styles.orgaTopTitle}>{selectedOrga.name || ''}健康信息</div>
-          <div className={styles.topOrgaCharts}>
-            <div className={styles.orgaHealthScore}>
-              <div className={styles.orgaScoreNumber}>{(selectedOrga.score || 0).toFixed(1)}</div>
-              <div className={styles.orgaScoreDesc}>健康得分</div>
-            </div>
-            <div className={styles.orgaHealthCharts}>
-
-              <MixLineCharts
-                mainlyScoreHistory={[...currentOrgaScoreHistory]}
-                commonScoreHistory={[...currentOrgaCommonHistory]}
-                lineData={{
-                  XData: ["2016", "2017", "2018", "2019", "2020"],
-                  data: [50, 20, 30, 40, 100],
-                  data2: [10, 30, 40, 90, 20]
-                }}/>
-            </div>
-          </div>
-          <div className={styles.abnormalIndex}>
-            <Row className={styles.abnormalList}>
-              异常标识
-            </Row>
-            <Divider className={styles.indexDivider}/>
-            <Row className={styles.indexTag}>
-              {/*<Radio.Group*/}
-              {/*  defaultValue={1}*/}
-              {/*  className={styles.radioGroup}*/}
-              {/*  onChange={changeIndex}*/}
-              {/*  optionType="button"*/}
-              {/*>*/}
-              {/*  <Space size={"middle"}>*/}
-              {GenerateRadioButton(illListTemp)}
-
-              {/*  </Space>*/}
-
-              {/*</Radio.Group>*/}
-
-            </Row>
-          </div>
-          <div className={styles.healthAdvice}>
-            <Row className={styles.adviceTitle}>
-              健康建议
-            </Row>
-            <Divider className={styles.indexDivider}/>
-            <Row className={styles.adviceContent}>
-
-              {GenerateAdviceList(currentOrgaHealthAdvice)}
-            </Row>
-          </div>
-
-        </div>
-        <div className={styles.rightOrgaBottom}>
-          <div className={styles.orgaBottomTitle}>部位异常标识</div>
-          <div className={styles.indexTable}>
-            <MyTable/>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
 
   return (
-    <Spin spinning={false} size="large">
-      <div className={styles.mainContainer}>
-        {bodyModel}
-        <div className={styles.siderColoumn}>
-          <div className={styles.userCard}>
-            <Col className={styles.avaterIcon}>
-              <Avatar size={64} className={styles.avaterContent}>{personalInfo.name || ''}</Avatar>
-            </Col>
-            <Col className={styles.infoDetail}>
-              <Row gutter={24} className={styles.topRow}>
-                <Col span={4} className={styles.genderIcon}>
-                  {
-                    (personalInfo.gender && ["男", "man", "male"].includes(personalInfo.gender)) ?
-                      <img className={styles.genderIcon} src={"./img/gendleMale.png"}/> :
-                      <img className={styles.genderIcon} src={"./img/groupMan.png"}/>
-                  }
-                </Col>
-                <Col span={18} className={styles.checkTime}>
-                  {personalInfo.last_check_time || ''}
-                </Col>
-              </Row>
-              <Row className={styles.bottomRow}>
-                <Col className={styles.personHeight}>
-                  <Tag className={styles.countTag}>{personalInfo.height || 188}&nbsp;cm</Tag>
-                  <Tag className={styles.countTag}>{personalInfo.weight || 77}&nbsp;kg</Tag>
-                </Col>
-                <Col className={styles.personWeight}></Col>
-              </Row>
-            </Col>
+    <div className={styles.mainContainer}>
+      {bodyModel}
+      {/* 本来是在父组件中调用子组件地·1方法，现在直接在子组件中使用 */}
+      {/*<div id={"subList"} className={styles.sliderMesh}>*/}
+      {/*    <span className={styles.avaterItem}>*/}
+      {/*     <Badge count={1}>*/}
+      {/*       <Tooltip title="皮肤" color={"lime"} placement="right">*/}
+      {/*          <Avatar*/}
+      {/*            size={{xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100}}*/}
+      {/*            icon={<AntDesignOutlined/>}*/}
+      {/*            onClick={() => enlargeItem("Body002")}*/}
+      {/*          />*/}
+      {/*       </Tooltip>*/}
 
-          </div>
-          <div className={styles.orgaList}>
-            <div className={styles.partName}>
-              <Select className={styles.partSelect}
-                      key={choosenPart}
-                      defaultValue={choosenPart}
-                      autoFocus={true}
-                      bordered={false}
-                      onChange={(value: any) => {
-                        bodyRef.current.ResetCompare();
-                        bodyRef.current.resetSlider();
-                        closeInfoWindow();
-                        setChoosenPart(value);
-                        if (dispatch) {
-                          dispatch({
-                            type: "bodyModel/initSelectedOrga",
-                            payload: {
-                              newSelectedOrga: null
-                            }
-                          })
-                        }
-                      }}
-                      dropdownClassName={styles.dropdownClassName}
-              >
-                {partOptions}
-              </Select>
-            </div>
-            <div className={styles.orgaOptions}>
-              {choosenPart ? orgaOptions[`${choosenPart}`] : <Empty/>}
+      {/*    </Badge>*/}
+      {/*    </span>*/}
 
-            </div>
-          </div>
-        </div>
-        {rightColumnContent}
-        <WholeBodyOrga
-          visible={visible}
-          onCancel={CloseOrgaModal}
-          modalTitle={modalTitle}
+      {/*  <span className={styles.avaterItem}>*/}
+      {/*     <Badge count={1}>*/}
+      {/*       <Tooltip title="骨骼" color={"lime"} placement="right">*/}
+      {/*          <Avatar*/}
+      {/*            size={{xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100}}*/}
+      {/*            icon={<AntDesignOutlined/>}*/}
+      {/*            onClick={() => enlargeItem("Skeletal001")}*/}
+      {/*          />*/}
+      {/*       </Tooltip>*/}
+      {/*    </Badge>*/}
+      {/*    </span>*/}
+      {/*  <span className={styles.avaterItem}>*/}
+      {/*     <Badge count={1}>*/}
+      {/*       <Tooltip title="器官" color={"lime"} placement="right">*/}
+      {/*          <Avatar*/}
+      {/*            size={{xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100}}*/}
+      {/*            icon={<AntDesignOutlined/>}*/}
+      {/*            onClick={() => enlargeItem("Circulatory_Heart001")}*/}
+      {/*          />*/}
+      {/*       </Tooltip>*/}
+      {/*    </Badge>*/}
+      {/*    </span>*/}
 
-        />
+      {/*</div>*/}
+      {/*<div id={"testAnt"} className={styles.infoCard}>*/}
+      {/*  <Row className={styles.infoTitle}>*/}
+      {/*    <Col id={"orgaName"}>{orgaName}</Col>*/}
+      {/*    <Col>*/}
+      {/*      <CloseCircleOutlined onClick={closeInfoWindow}/>*/}
+      {/*    </Col>*/}
+      {/*  </Row>*/}
+      {/*  <Divider className={styles.infoDivider}/>*/}
+      {/*  <Row id={"orgaDesc"} className={styles.organDesc}>*/}
+      {/*    {orgaDesc}*/}
+      {/*  </Row>*/}
+
+      {/*  <Row gutter={24} id={"illCarousel"} className={styles.illCarousel}>*/}
 
 
-      </div>
-    </Spin>
+      {/*    <Carousel className={"carousel"}>*/}
+      {/*      {renderCarsoule()}*/}
+      {/*    </Carousel>*/}
+
+      {/*  </Row>*/}
+
+      {/*</div>*/}
+
+
+    </div>
   )
 }
 
